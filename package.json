@@ -1,0 +1,24 @@
+{
+  "name": "sentiment_analysis_server",
+  "version": "1.0.0",
+  "description": "A server for sentiment analysis dashboard",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/myapos/sentiment_analysis_server.git"
+  },
+  "keywords": [
+    "nodejs",
+    "npm",
+    "express"
+  ],
+  "author": "Myron Apostolakis",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/myapos/sentiment_analysis_server/issues"
+  },
+  "homepage": "https://github.com/myapos/sentiment_analysis_server#readme"
+}
