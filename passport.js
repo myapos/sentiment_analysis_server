@@ -10,9 +10,13 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser((user, done) => {
   done(null, user);
 });
-passport.use(new FacebookStrategy({
-  clientID: FACEBOOK_APP_ID,
-  clientSecret: SECRET,
-  callbackURL: `http://localhost:${PORT}/auth/facebook/callback`,
-},
-((accessToken, refreshToken, profile, done) => done(null, profile))));
+passport.use(
+  new FacebookStrategy(
+    {
+      clientID: FACEBOOK_APP_ID,
+      clientSecret: SECRET,
+      callbackURL: `http://localhost:${PORT}/auth/facebook/callback`,
+    },
+    (accessToken, refreshToken, profile, done) => done(null, profile)
+  )
+);
