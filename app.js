@@ -1,5 +1,7 @@
 const express = require('express');
 const passport = require('passport');
+const cors = require('cors');
+
 const { Strategy } = require('passport-facebook');
 
 const router = require('./router.js');
@@ -60,6 +62,8 @@ passport.deserializeUser((obj, cb) => {
 // Create a new Express application.
 const app = express();
 
+app.use(cors());
+
 app.use(require('cookie-parser')());
 app.use(require('body-parser').urlencoded({ extended: true }));
 app.use(
@@ -80,6 +84,10 @@ app.use(passport.session());
 // Define routes.
 app.get('/', (req, res) => {
   res.status(200).json({ home: 'OK' });
+});
+
+app.get('/check', (req, res) => {
+  res.status(200).json({ check: 'OK' });
 });
 
 app.get('/login', (req, res) => {
