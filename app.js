@@ -1,23 +1,13 @@
 const express = require('express');
 const passport = require('passport');
 const cors = require('cors');
-
 const { Strategy } = require('passport-facebook');
 
-const router = require('./router.js');
+const helmet = require('helmet');
 
 const { FACEBOOK_APP_ID, SECRET, CALLBACK_URL } = require('./config.js');
 
 const { PORT } = require('./constants');
-
-function isLoggedIn(req, res, next) {
-  console.log('is authenticated', req.isAuthenticated());
-  console.log('user', req.user);
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.redirect('/');
-}
 
 // Configure the Facebook strategy for use by Passport.
 //
@@ -61,11 +51,13 @@ passport.deserializeUser((obj, cb) => {
 });
 // Create a new Express application.
 const app = express();
-
+app.use(helmet());
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 app.use(cors());
 
 app.use(require('cookie-parser')());
 app.use(require('body-parser').urlencoded({ extended: true }));
+
 app.use(
   require('express-session')({
     secret: 'keyboard cat',
@@ -83,6 +75,12 @@ app.use(passport.session());
 
 // Define routes.
 app.get('/', (req, res) => {
+  // res.cookie('nameOfCookie', 'cookieValue', {
+  //   maxAge: 60 * 60 * 1000, // 1 hour
+  //   httpOnly: false,
+  //   secure: false,
+  //   sameSite: true,
+  // });
   res.status(200).json({ home: 'OK' });
 });
 
@@ -108,7 +106,16 @@ app.get(
   '/profile',
   require('connect-ensure-login').ensureLoggedIn(),
   (req, res) => {
-    res.status(200).json({ user: req.user });
+    const { id, displayName, provider } = req.user;
+    res.cookie('connect.sid', req.cookies['connect.sid'], {
+      maxAge: 30 * 60 * 1000, // 1/2 hour
+      httpOnly: false,
+      //   secure: false,
+      sameSite: true,
+    });
+    res.redirect(`http://localhost:3000?name=${encodeURIComponent(displayName)}
+    &id=${encodeURIComponent(id)}
+    &provider=${encodeURIComponent(provider)}`);
   },
 );
 
