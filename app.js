@@ -121,7 +121,9 @@ app.get(
 
 app.get('/logout', (req, res) => {
   req.logout();
-  res.redirect('/');
+  res.clearCookie('connect.sid');
+  // res.redirect('http://localhost:3000/');
+  res.status(200).json({ clearedCookies: 'OK' });
 });
 
 app.listen(PORT, () => {
