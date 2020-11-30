@@ -1,11 +1,18 @@
 const express = require('express');
 const passport = require('passport');
 const cors = require('cors');
+const fetch = require('node-fetch');
+
 const { Strategy } = require('passport-facebook');
 
 const helmet = require('helmet');
 
-const { FACEBOOK_APP_ID, SECRET, CALLBACK_URL } = require('./config.js');
+const {
+  FACEBOOK_APP_ID,
+  SECRET,
+  CALLBACK_URL,
+  TWITTER_BEARER_TOKEN,
+} = require('./config.js');
 
 const { PORT } = require('./constants');
 
@@ -124,6 +131,28 @@ app.get('/logout', (req, res) => {
   res.clearCookie('connect.sid');
   // res.redirect('http://localhost:3000/');
   res.status(200).json({ clearedCookies: 'OK' });
+});
+
+app.get('/tweets', (req, res) => {
+  const {
+    query: { query },
+  } = req;
+
+  fetch(
+    `https://api.twitter.com/2/tweets/search/recent?query=${query}&max_results=100`,
+    {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${TWITTER_BEARER_TOKEN}`,
+      },
+    },
+  )
+    .then((twitter) => twitter.json())
+    .then((tweets) => res.status(200).json(tweets))
+    .catch((e) => {
+      res.status(400).json(e);
+    });
 });
 
 app.listen(PORT, () => {
