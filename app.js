@@ -1,11 +1,19 @@
 const express = require('express');
 const passport = require('passport');
 const cors = require('cors');
+const fetch = require('node-fetch');
 const { Strategy } = require('passport-facebook');
 
 const helmet = require('helmet');
 
-const { FACEBOOK_APP_ID, SECRET, CALLBACK_URL } = require('./config.js');
+const handleErrors = require('./middleware/handleErrors');
+const { BadRequest } = require('./utils/errors');
+const {
+  FACEBOOK_APP_ID,
+  SECRET,
+  CALLBACK_URL,
+  TWITTER_BEARER_TOKEN,
+} = require('./config.js');
 
 const { PORT } = require('./constants');
 
@@ -126,6 +134,35 @@ app.get('/logout', (req, res) => {
   res.status(200).json({ clearedCookies: 'OK' });
 });
 
+app.get('/tweets', (req, res, next) => {
+  const {
+    query: { query },
+  } = req;
+
+  fetch(
+    `https://api.twitter.com/2/tweets/search/recent?query=${encodeURIComponent(
+      query
+    )}&max_results=100`,
+    {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${TWITTER_BEARER_TOKEN}`,
+      },
+    }
+  )
+    .then((twitter) => twitter.json())
+    .then((tweets) => res.status(200).json(tweets))
+    .catch((e) => {
+      const error = new BadRequest(e.message);
+      next(error);
+      // res.status(400).json({
+      //   status: 400,
+      //   ...e,
+      // });
+    });
+});
+app.use(handleErrors);
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`);
 });
