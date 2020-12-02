@@ -5,6 +5,9 @@ const fetch = require('node-fetch');
 const { Strategy } = require('passport-facebook');
 
 const helmet = require('helmet');
+const Sentiment = require('sentiment');
+
+const sentiment = new Sentiment();
 
 const handleErrors = require('./middleware/handleErrors');
 const { BadRequest } = require('./utils/errors');
@@ -37,8 +40,8 @@ passport.use(
       // be associated with a user record in the application's database, which
       // allows for account linking and authentication with other identity
       // providers.
-      cb(null, profile)
-  )
+      cb(null, profile),
+  ),
 );
 
 // Configure Passport authenticated session persistence.
@@ -71,7 +74,7 @@ app.use(
     secret: 'keyboard cat',
     resave: true,
     saveUninitialized: true,
-  })
+  }),
 );
 
 // Initialize Passport and restore authentication state, if any, from the
@@ -107,7 +110,7 @@ app.get(
   passport.authenticate('facebook', { failureRedirect: '/login' }),
   (req, res) => {
     res.redirect('/profile');
-  },
+  }
 );
 
 app.get(
@@ -124,7 +127,7 @@ app.get(
     res.redirect(`http://localhost:3000?name=${encodeURIComponent(displayName)}
     &id=${encodeURIComponent(id)}
     &provider=${encodeURIComponent(provider)}`);
-  },
+  }
 );
 
 app.get('/logout', (req, res) => {
@@ -141,7 +144,7 @@ app.get('/tweets', (req, res, next) => {
 
   fetch(
     `https://api.twitter.com/2/tweets/search/recent?query=${encodeURIComponent(
-      query
+      query,
     )}&max_results=100`,
     {
       method: 'get',
@@ -149,10 +152,22 @@ app.get('/tweets', (req, res, next) => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${TWITTER_BEARER_TOKEN}`,
       },
-    }
+    },
   )
     .then((twitter) => twitter.json())
-    .then((tweets) => res.status(200).json(tweets))
+    .then((tweets) => {
+      console.log('tweets', tweets.data[0].text);
+      let score = 0;
+      tweets.data.forEach((tweet) => {
+        const tempScore = sentiment.analyze(tweet.text).score;
+        console.log('tempScore', tempScore);
+        score += parseInt(tempScore);
+      });
+      console.log('score', score);
+      // const sentiment_result = sentiment.analyze(tweets.data[0].text);
+      // console.dir(sentiment_result);
+      return res.status(200).json({ ...tweets, score });
+    })
     .catch((e) => {
       const error = new BadRequest(e.message);
       next(error);
