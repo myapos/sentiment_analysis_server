@@ -5,6 +5,9 @@ const fetch = require('node-fetch');
 const { Strategy } = require('passport-facebook');
 
 const helmet = require('helmet');
+const Sentiment = require('sentiment');
+
+const sentiment = new Sentiment();
 
 const handleErrors = require('./middleware/handleErrors');
 const { BadRequest } = require('./utils/errors');
@@ -152,7 +155,16 @@ app.get('/tweets', (req, res, next) => {
     }
   )
     .then((twitter) => twitter.json())
-    .then((tweets) => res.status(200).json(tweets))
+    .then((tweets) => {
+      let score = 0;
+      tweets.data.forEach((tweet) => {
+        const tempScore = sentiment.analyze(tweet.text).score;
+        score += parseInt(tempScore);
+      });
+      // const sentiment_result = sentiment.analyze(tweets.data[0].text);
+      // console.dir(sentiment_result);
+      return res.status(200).json({ ...tweets, score });
+    })
     .catch((e) => {
       const error = new BadRequest(e.message);
       next(error);
