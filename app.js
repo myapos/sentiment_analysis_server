@@ -3,6 +3,7 @@ const passport = require('passport');
 const cors = require('cors');
 const fetch = require('node-fetch');
 const { Strategy } = require('passport-facebook');
+const TwitterStrategy = require('passport-twitter').Strategy;
 
 const helmet = require('helmet');
 const Sentiment = require('sentiment');
@@ -14,8 +15,12 @@ const { BadRequest } = require('./utils/errors');
 const {
   FACEBOOK_APP_ID,
   SECRET,
-  CALLBACK_URL,
+  CALLBACK_URL_FACEBOOK,
   TWITTER_BEARER_TOKEN,
+  TWITTER_API_KEY_FOR_LOGIN,
+  TWITTER_SECRET_KEY_FOR_LOGIN,
+  TWITTER_BEARER_TOKEN_FOR_LOGIN,
+  CALLBACK_URL_TWITTER,
 } = require('./config.js');
 
 const { PORT } = require('./constants');
@@ -32,7 +37,7 @@ passport.use(
     {
       clientID: FACEBOOK_APP_ID,
       clientSecret: SECRET,
-      callbackURL: CALLBACK_URL,
+      callbackURL: CALLBACK_URL_FACEBOOK,
     },
     (accessToken, refreshToken, profile, cb) =>
       // In this example, the user's Facebook profile is supplied as the user
@@ -41,6 +46,20 @@ passport.use(
       // allows for account linking and authentication with other identity
       // providers.
       cb(null, profile)
+  )
+);
+
+passport.use(
+  new TwitterStrategy(
+    {
+      consumerKey: TWITTER_API_KEY_FOR_LOGIN,
+      consumerSecret: TWITTER_SECRET_KEY_FOR_LOGIN,
+      callbackURL: CALLBACK_URL_TWITTER,
+    },
+    (token, tokenSecret, profile, cb) => {
+      User.findOrCreate({ twitterId: profile.id }, (err, user) => cb(err, user),
+      );
+    }
   )
 );
 
@@ -105,12 +124,22 @@ app.get('/login', (req, res) => {
 
 app.get('/login/facebook', passport.authenticate('facebook'));
 
+app.get('/login/twitter', passport.authenticate('twitter'));
+
 app.get(
   '/return',
   passport.authenticate('facebook', { failureRedirect: '/login' }),
   (req, res) => {
     res.redirect('/profile');
   },
+);
+
+app.get(
+  '/return_twitter',
+  passport.authenticate('twitter', { failureRedirect: '/login' }),
+  (req, res) => {
+    res.redirect('/profile');
+  }
 );
 
 app.get(
