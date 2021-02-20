@@ -3,6 +3,7 @@ const passport = require('passport');
 const cors = require('cors');
 const fetch = require('node-fetch');
 const { Strategy } = require('passport-facebook');
+const TwitterStrategy = require('passport-twitter').Strategy;
 
 const helmet = require('helmet');
 const Sentiment = require('sentiment');
@@ -13,9 +14,13 @@ const handleErrors = require('./middleware/handleErrors');
 const { BadRequest } = require('./utils/errors');
 const {
   FACEBOOK_APP_ID,
-  SECRET,
-  CALLBACK_URL,
+  FACEBOOK_SECRET,
+  CALLBACK_URL_FACEBOOK,
+  CALLBACK_URL_TWITTER,
+  TWITTER_API_KEY,
+  TWITTER_API_KEY_SECRET,
   TWITTER_BEARER_TOKEN,
+  TWITTER_ACCESS_TOKEN,
 } = require('./config.js');
 
 const { PORT } = require('./constants');
@@ -31,8 +36,8 @@ passport.use(
   new Strategy(
     {
       clientID: FACEBOOK_APP_ID,
-      clientSecret: SECRET,
-      callbackURL: CALLBACK_URL,
+      clientSecret: FACEBOOK_SECRET,
+      callbackURL: CALLBACK_URL_FACEBOOK,
     },
     (accessToken, refreshToken, profile, cb) =>
       // In this example, the user's Facebook profile is supplied as the user
@@ -42,6 +47,20 @@ passport.use(
       // providers.
       cb(null, profile)
   )
+);
+
+passport.use(
+  new TwitterStrategy(
+    {
+      consumerKey: TWITTER_API_KEY,
+      consumerSecret: TWITTER_API_KEY_SECRET,
+      callbackURL: CALLBACK_URL_TWITTER,
+    },
+    (token, tokenSecret, profile, cb) =>
+      // User.findOrCreate({ twitterId: profile.id }, (err, user) => cb(err, user),
+      // );
+      cb(null, profile),
+  ),
 );
 
 // Configure Passport authenticated session persistence.
@@ -111,6 +130,23 @@ app.get(
   (req, res) => {
     res.redirect('/profile');
   },
+);
+
+// Redirect the user to Twitter for authentication.  When complete, Twitter
+// will redirect the user back to the application at
+//   /auth/twitter/callback
+app.get('/login/twitter', passport.authenticate('twitter'));
+
+// Twitter will redirect the user to this URL after approval.  Finish the
+// authentication process by attempting to obtain an access token.  If
+// access was granted, the user will be logged in.  Otherwise,
+// authentication has failed.
+app.get(
+  '/return_twitter',
+  passport.authenticate('twitter', {
+    successRedirect: '/profile',
+    failureRedirect: '/login',
+  })
 );
 
 app.get(
