@@ -14,13 +14,13 @@ const handleErrors = require('./middleware/handleErrors');
 const { BadRequest } = require('./utils/errors');
 const {
   FACEBOOK_APP_ID,
-  SECRET,
+  FACEBOOK_SECRET,
   CALLBACK_URL_FACEBOOK,
-  TWITTER_BEARER_TOKEN,
-  TWITTER_API_KEY_FOR_LOGIN,
-  TWITTER_SECRET_KEY_FOR_LOGIN,
-  TWITTER_BEARER_TOKEN_FOR_LOGIN,
   CALLBACK_URL_TWITTER,
+  TWITTER_API_KEY,
+  TWITTER_API_KEY_SECRET,
+  TWITTER_BEARER_TOKEN,
+  TWITTER_ACCESS_TOKEN,
 } = require('./config.js');
 
 const { PORT } = require('./constants');
@@ -36,7 +36,7 @@ passport.use(
   new Strategy(
     {
       clientID: FACEBOOK_APP_ID,
-      clientSecret: SECRET,
+      clientSecret: FACEBOOK_SECRET,
       callbackURL: CALLBACK_URL_FACEBOOK,
     },
     (accessToken, refreshToken, profile, cb) =>
@@ -52,15 +52,15 @@ passport.use(
 passport.use(
   new TwitterStrategy(
     {
-      consumerKey: TWITTER_API_KEY_FOR_LOGIN,
-      consumerSecret: TWITTER_SECRET_KEY_FOR_LOGIN,
+      consumerKey: TWITTER_API_KEY,
+      consumerSecret: TWITTER_API_KEY_SECRET,
       callbackURL: CALLBACK_URL_TWITTER,
     },
-    (token, tokenSecret, profile, cb) => {
-      User.findOrCreate({ twitterId: profile.id }, (err, user) => cb(err, user),
-      );
-    }
-  )
+    (token, tokenSecret, profile, cb) =>
+      // User.findOrCreate({ twitterId: profile.id }, (err, user) => cb(err, user),
+      // );
+      cb(null, profile),
+  ),
 );
 
 // Configure Passport authenticated session persistence.
@@ -124,8 +124,6 @@ app.get('/login', (req, res) => {
 
 app.get('/login/facebook', passport.authenticate('facebook'));
 
-app.get('/login/twitter', passport.authenticate('twitter'));
-
 app.get(
   '/return',
   passport.authenticate('facebook', { failureRedirect: '/login' }),
@@ -134,12 +132,21 @@ app.get(
   },
 );
 
+// Redirect the user to Twitter for authentication.  When complete, Twitter
+// will redirect the user back to the application at
+//   /auth/twitter/callback
+app.get('/login/twitter', passport.authenticate('twitter'));
+
+// Twitter will redirect the user to this URL after approval.  Finish the
+// authentication process by attempting to obtain an access token.  If
+// access was granted, the user will be logged in.  Otherwise,
+// authentication has failed.
 app.get(
   '/return_twitter',
-  passport.authenticate('twitter', { failureRedirect: '/login' }),
-  (req, res) => {
-    res.redirect('/profile');
-  }
+  passport.authenticate('twitter', {
+    successRedirect: '/profile',
+    failureRedirect: '/login',
+  })
 );
 
 app.get(
