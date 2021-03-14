@@ -4,6 +4,7 @@ const cors = require('cors');
 const fetch = require('node-fetch');
 const { Strategy } = require('passport-facebook');
 const TwitterStrategy = require('passport-twitter').Strategy;
+const LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
 
 const helmet = require('helmet');
 const Sentiment = require('sentiment');
@@ -20,7 +21,9 @@ const {
   TWITTER_API_KEY,
   TWITTER_API_KEY_SECRET,
   TWITTER_BEARER_TOKEN,
-  TWITTER_ACCESS_TOKEN,
+  LINKEDIN_API_KEY,
+  LINKEDIN_SECRET_KEY,
+  CALLBACK_URL_LINKEDIN,
 } = require('./config.js');
 
 const { PORT } = require('./constants');
@@ -59,8 +62,29 @@ passport.use(
     (token, tokenSecret, profile, cb) =>
       // User.findOrCreate({ twitterId: profile.id }, (err, user) => cb(err, user),
       // );
-      cb(null, profile),
-  ),
+      cb(null, profile)
+  )
+);
+
+passport.use(
+  new LinkedInStrategy(
+    {
+      clientID: LINKEDIN_API_KEY,
+      clientSecret: LINKEDIN_SECRET_KEY,
+      callbackURL: CALLBACK_URL_LINKEDIN,
+      // scope: ['r_emailaddress', 'r_liteprofile'],
+    },
+    (token, tokenSecret, profile, done) => {
+      // asynchronous verification, for effect...
+      process.nextTick(() =>
+        // To keep the example simple, the user's LinkedIn profile is returned to
+        // represent the logged-in user.  In a typical application, you would want
+        // to associate the LinkedIn account with a user record in your database,
+        // and return that user instead.
+        done(null, profile)
+      );
+    }
+  )
 );
 
 // Configure Passport authenticated session persistence.
@@ -144,6 +168,16 @@ app.get('/login/twitter', passport.authenticate('twitter'));
 app.get(
   '/return_twitter',
   passport.authenticate('twitter', {
+    successRedirect: '/profile',
+    failureRedirect: '/login',
+  })
+);
+
+app.get('/login/linkedin', passport.authenticate('linkedin'));
+
+app.get(
+  '/auth/linkedin/callback',
+  passport.authenticate('linkedin', {
     successRedirect: '/profile',
     failureRedirect: '/login',
   })
