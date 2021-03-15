@@ -5,7 +5,7 @@ const FACEBOOK = {
   CALLBACK_URL: '/return',
 };
 
-const SECRET_KEY_FOR_HASHING = 'KOFINAS@@crete2020';
+const SECRET_KEY_FOR_HASHING = 'YOUR_VALUE';
 
 /* TWITTER */
 const TWITTER = {
