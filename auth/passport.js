@@ -20,7 +20,6 @@ module.exports = function (passport) {
         callbackURL: CALLBACK_URL,
       },
       (accessToken, refreshToken, profile, done) => {
-        console.log('profile', profile);
         done(null, profile);
       }
     )

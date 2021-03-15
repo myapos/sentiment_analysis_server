@@ -1,0 +1,42 @@
+/* FACEBOOK */
+const FACEBOOK = {
+  APP_ID: 'YOUR_VALUE',
+  SECRET: 'YOUR_VALUE',
+  CALLBACK_URL: '/return',
+};
+
+const SECRET_KEY_FOR_HASHING = 'KOFINAS@@crete2020';
+
+/* TWITTER */
+const TWITTER = {
+  API_KEY: 'YOUR_VALUE',
+  API_KEY_SECRET: 'YOUR_VALUE',
+  ACCESS_TOKEN: 'YOUR_VALUE',
+  ACCESS_TOKEN_SECRET: 'YOUR_VALUE',
+  BEARER_TOKEN: 'YOUR_VALUE',
+  CALLBACK_URL: '/return_twitter',
+};
+
+/* LINKEDIN */
+const LINKEDIN = {
+  API_KEY: 'YOUR_VALUE',
+  SECRET_KEY: 'YOUR_VALUE',
+  CALLBACK_URL: '/auth/linkedin/callback',
+};
+
+/* GOOGLE */
+// https://medium.com/the-dev-caf%C3%A9/log-in-with-google-oauth-2-0-node-js-and-passport-js-1f8abe096175
+const GOOGLE = {
+  CLIENT_ID:
+    'YOUR_VALUE',
+  CLIENT_SECRET: 'YOUR_VALUE',
+  CALLBACK_URL: '/auth/google/callback',
+};
+
+module.exports = {
+  FACEBOOK,
+  SECRET_KEY_FOR_HASHING,
+  TWITTER,
+  LINKEDIN,
+  GOOGLE,
+};
