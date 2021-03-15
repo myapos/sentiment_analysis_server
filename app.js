@@ -30,7 +30,6 @@ const {
 const { PORT } = require('./constants');
 
 // Configure the Facebook strategy for use by Passport.
-//
 // OAuth 2.0-based strategies require a `verify` function which receives the
 // credential (`accessToken`) for accessing the Facebook API on the user's
 // behalf, along with the user's profile.  The function must invoke `cb`
@@ -57,7 +56,7 @@ passport.use(
   new TwitterStrategy(
     {
       consumerKey: TWITTER.API_KEY,
-      consumerSecret: TWITTER.KEY_SECRET,
+      consumerSecret: TWITTER.API_KEY_SECRET,
       callbackURL: TWITTER.CALLBACK_URL,
     },
     (token, tokenSecret, profile, cb) =>
@@ -116,6 +115,7 @@ passport.deserializeUser((obj, cb) => {
 });
 // Create a new Express application.
 const app = express();
+
 app.use(helmet());
 app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 app.use(cors());
@@ -149,8 +149,6 @@ app.get('/login', (req, res) => {
   res.status(200).json({ login: 'OK' });
 });
 
-app.get('/login/facebook', passport.authenticate('facebook'));
-
 app.get(
   FACEBOOK.CALLBACK_URL,
   passport.authenticate('facebook', { failureRedirect: '/login' }),
@@ -159,24 +157,13 @@ app.get(
   }
 );
 
-// Redirect the user to Twitter for authentication.  When complete, Twitter
-// will redirect the user back to the application at
-//   /auth/twitter/callback
-app.get('/login/twitter', passport.authenticate('twitter'));
-
-// Twitter will redirect the user to this URL after approval.  Finish the
-// authentication process by attempting to obtain an access token.  If
-// access was granted, the user will be logged in.  Otherwise,
-// authentication has failed.
 app.get(
-  '/return_twitter',
+  TWITTER.CALLBACK_URL,
   passport.authenticate('twitter', {
     successRedirect: '/profile',
     failureRedirect: '/login',
   })
 );
-
-app.get('/login/linkedin', passport.authenticate('linkedin'));
 
 app.get(
   LINKEDIN.CALLBACK_URL,
@@ -187,17 +174,28 @@ app.get(
 );
 
 app.get(
-  '/login/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] }),
-);
-
-app.get(
-  // '/auth/google/callback',
   GOOGLE.CALLBACK_URL,
   passport.authenticate('google', {
     successRedirect: '/profile',
     failureRedirect: '/login',
   })
+);
+
+app.get('/login/facebook', passport.authenticate('facebook'));
+
+// Redirect the user to Twitter for authentication.  When complete, Twitter
+// will redirect the user back to the application at
+app.get('/login/twitter', passport.authenticate('twitter'));
+
+// Twitter will redirect the user to this URL after approval.  Finish the
+// authentication process by attempting to obtain an access token.  If
+// access was granted, the user will be logged in.  Otherwise,
+// authentication has failed.
+app.get('/login/linkedin', passport.authenticate('linkedin'));
+
+app.get(
+  '/login/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] }),
 );
 
 app.get(
