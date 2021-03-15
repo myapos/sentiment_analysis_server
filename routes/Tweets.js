@@ -30,17 +30,11 @@ const Teets = (app) => {
           const tempScore = sentiment.analyze(tweet.text).score;
           score += parseInt(tempScore);
         });
-        // const sentiment_result = sentiment.analyze(tweets.data[0].text);
-        // console.dir(sentiment_result);
         return res.status(200).json({ ...tweets, score });
       })
       .catch((e) => {
         const error = new BadRequest(e.message);
         next(error);
-        // res.status(400).json({
-        //   status: 400,
-        //   ...e,
-        // });
       });
   });
 };
