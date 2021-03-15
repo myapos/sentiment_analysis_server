@@ -5,6 +5,7 @@ const fetch = require('node-fetch');
 const { Strategy } = require('passport-facebook');
 const TwitterStrategy = require('passport-twitter').Strategy;
 const LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 const helmet = require('helmet');
 const Sentiment = require('sentiment');
@@ -24,6 +25,9 @@ const {
   LINKEDIN_API_KEY,
   LINKEDIN_SECRET_KEY,
   CALLBACK_URL_LINKEDIN,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_CALLBACK_URL,
 } = require('./config.js');
 
 const { PORT } = require('./constants');
@@ -87,6 +91,16 @@ passport.use(
   )
 );
 
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      callbackURL: GOOGLE_CALLBACK_URL,
+    },
+    (accessToken, refreshToken, profile, cb) => cb(null, profile)
+  )
+);
 // Configure Passport authenticated session persistence.
 //
 // In order to restore authentication state across HTTP requests, Passport needs
@@ -178,6 +192,19 @@ app.get('/login/linkedin', passport.authenticate('linkedin'));
 app.get(
   '/auth/linkedin/callback',
   passport.authenticate('linkedin', {
+    successRedirect: '/profile',
+    failureRedirect: '/login',
+  })
+);
+
+app.get(
+  '/login/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] }),
+);
+
+app.get(
+  '/auth/google/callback',
+  passport.authenticate('google', {
     successRedirect: '/profile',
     failureRedirect: '/login',
   })
