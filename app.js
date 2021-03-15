@@ -15,19 +15,16 @@ const sentiment = new Sentiment();
 const handleErrors = require('./middleware/handleErrors');
 const { BadRequest } = require('./utils/errors');
 const {
-  FACEBOOK_APP_ID,
-  FACEBOOK_SECRET,
-  CALLBACK_URL_FACEBOOK,
-  CALLBACK_URL_TWITTER,
-  TWITTER_API_KEY,
-  TWITTER_API_KEY_SECRET,
-  TWITTER_BEARER_TOKEN,
-  LINKEDIN_API_KEY,
-  LINKEDIN_SECRET_KEY,
-  CALLBACK_URL_LINKEDIN,
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  GOOGLE_CALLBACK_URL,
+  FACEBOOK,
+  TWITTER,
+  LINKEDIN,
+  // LINKEDIN_API_KEY,
+  // LINKEDIN_SECRET_KEY,
+  // CALLBACK_URL_LINKEDIN,
+  GOOGLE,
+  // GOOGLE_CLIENT_ID,
+  // GOOGLE_CLIENT_SECRET,
+  // GOOGLE_CALLBACK_URL,
 } = require('./config.js');
 
 const { PORT } = require('./constants');
@@ -42,9 +39,9 @@ const { PORT } = require('./constants');
 passport.use(
   new Strategy(
     {
-      clientID: FACEBOOK_APP_ID,
-      clientSecret: FACEBOOK_SECRET,
-      callbackURL: CALLBACK_URL_FACEBOOK,
+      clientID: FACEBOOK.APP_ID,
+      clientSecret: FACEBOOK.SECRET,
+      callbackURL: FACEBOOK.CALLBACK_URL,
     },
     (accessToken, refreshToken, profile, cb) =>
       // In this example, the user's Facebook profile is supplied as the user
@@ -59,9 +56,9 @@ passport.use(
 passport.use(
   new TwitterStrategy(
     {
-      consumerKey: TWITTER_API_KEY,
-      consumerSecret: TWITTER_API_KEY_SECRET,
-      callbackURL: CALLBACK_URL_TWITTER,
+      consumerKey: TWITTER.API_KEY,
+      consumerSecret: TWITTER.KEY_SECRET,
+      callbackURL: TWITTER.CALLBACK_URL,
     },
     (token, tokenSecret, profile, cb) =>
       // User.findOrCreate({ twitterId: profile.id }, (err, user) => cb(err, user),
@@ -73,9 +70,9 @@ passport.use(
 passport.use(
   new LinkedInStrategy(
     {
-      clientID: LINKEDIN_API_KEY,
-      clientSecret: LINKEDIN_SECRET_KEY,
-      callbackURL: CALLBACK_URL_LINKEDIN,
+      clientID: LINKEDIN.API_KEY,
+      clientSecret: LINKEDIN.SECRET_KEY,
+      callbackURL: LINKEDIN.CALLBACK_URL,
       // scope: ['r_emailaddress', 'r_liteprofile'],
     },
     (token, tokenSecret, profile, done) => {
@@ -94,9 +91,9 @@ passport.use(
 passport.use(
   new GoogleStrategy(
     {
-      clientID: GOOGLE_CLIENT_ID,
-      clientSecret: GOOGLE_CLIENT_SECRET,
-      callbackURL: GOOGLE_CALLBACK_URL,
+      clientID: GOOGLE.CLIENT_ID,
+      clientSecret: GOOGLE.CLIENT_SECRET,
+      callbackURL: GOOGLE.CALLBACK_URL,
     },
     (accessToken, refreshToken, profile, cb) => cb(null, profile)
   )
@@ -139,16 +136,8 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// app.use('/', router);
-
 // Define routes.
 app.get('/', (req, res) => {
-  // res.cookie('nameOfCookie', 'cookieValue', {
-  //   maxAge: 60 * 60 * 1000, // 1 hour
-  //   httpOnly: false,
-  //   secure: false,
-  //   sameSite: true,
-  // });
   res.status(200).json({ home: 'OK' });
 });
 
@@ -163,11 +152,11 @@ app.get('/login', (req, res) => {
 app.get('/login/facebook', passport.authenticate('facebook'));
 
 app.get(
-  '/return',
+  FACEBOOK.CALLBACK_URL,
   passport.authenticate('facebook', { failureRedirect: '/login' }),
   (req, res) => {
     res.redirect('/profile');
-  },
+  }
 );
 
 // Redirect the user to Twitter for authentication.  When complete, Twitter
@@ -190,7 +179,7 @@ app.get(
 app.get('/login/linkedin', passport.authenticate('linkedin'));
 
 app.get(
-  '/auth/linkedin/callback',
+  LINKEDIN.CALLBACK_URL,
   passport.authenticate('linkedin', {
     successRedirect: '/profile',
     failureRedirect: '/login',
@@ -203,7 +192,8 @@ app.get(
 );
 
 app.get(
-  '/auth/google/callback',
+  // '/auth/google/callback',
+  GOOGLE.CALLBACK_URL,
   passport.authenticate('google', {
     successRedirect: '/profile',
     failureRedirect: '/login',
@@ -247,7 +237,7 @@ app.get('/tweets', (req, res, next) => {
       method: 'get',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${TWITTER_BEARER_TOKEN}`,
+        Authorization: `Bearer ${TWITTER.BEARER_TOKEN}`,
       },
     }
   )
