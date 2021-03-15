@@ -2,110 +2,28 @@ const express = require('express');
 const passport = require('passport');
 const cors = require('cors');
 const fetch = require('node-fetch');
-const { Strategy } = require('passport-facebook');
-const TwitterStrategy = require('passport-twitter').Strategy;
-const LinkedInStrategy = require('passport-linkedin-oauth2').Strategy;
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
+
+/* Strategies */
 
 const helmet = require('helmet');
 const Sentiment = require('sentiment');
+const Strategies = require('./strategies');
 
 const sentiment = new Sentiment();
 
 const handleErrors = require('./middleware/handleErrors');
 const { BadRequest } = require('./utils/errors');
-const {
-  FACEBOOK,
-  TWITTER,
-  LINKEDIN,
-  // LINKEDIN_API_KEY,
-  // LINKEDIN_SECRET_KEY,
-  // CALLBACK_URL_LINKEDIN,
-  GOOGLE,
-  // GOOGLE_CLIENT_ID,
-  // GOOGLE_CLIENT_SECRET,
-  // GOOGLE_CALLBACK_URL,
-} = require('./config.js');
+const { FACEBOOK, TWITTER, LINKEDIN, GOOGLE } = require('./config.js');
 
 const { PORT } = require('./constants');
 
-// Configure the Facebook strategy for use by Passport.
-// OAuth 2.0-based strategies require a `verify` function which receives the
-// credential (`accessToken`) for accessing the Facebook API on the user's
-// behalf, along with the user's profile.  The function must invoke `cb`
-// with a user object, which will be set at `req.user` in route handlers after
-// authentication.
-passport.use(
-  new Strategy(
-    {
-      clientID: FACEBOOK.APP_ID,
-      clientSecret: FACEBOOK.SECRET,
-      callbackURL: FACEBOOK.CALLBACK_URL,
-    },
-    (accessToken, refreshToken, profile, cb) =>
-      // In this example, the user's Facebook profile is supplied as the user
-      // record.  In a production-quality application, the Facebook profile should
-      // be associated with a user record in the application's database, which
-      // allows for account linking and authentication with other identity
-      // providers.
-      cb(null, profile)
-  )
-);
+/* Load Strategies */
 
-passport.use(
-  new TwitterStrategy(
-    {
-      consumerKey: TWITTER.API_KEY,
-      consumerSecret: TWITTER.API_KEY_SECRET,
-      callbackURL: TWITTER.CALLBACK_URL,
-    },
-    (token, tokenSecret, profile, cb) =>
-      // User.findOrCreate({ twitterId: profile.id }, (err, user) => cb(err, user),
-      // );
-      cb(null, profile)
-  )
-);
+Strategies.Facebook();
+Strategies.Twitter();
+Strategies.LinkedIn();
+Strategies.Google();
 
-passport.use(
-  new LinkedInStrategy(
-    {
-      clientID: LINKEDIN.API_KEY,
-      clientSecret: LINKEDIN.SECRET_KEY,
-      callbackURL: LINKEDIN.CALLBACK_URL,
-      // scope: ['r_emailaddress', 'r_liteprofile'],
-    },
-    (token, tokenSecret, profile, done) => {
-      // asynchronous verification, for effect...
-      process.nextTick(() =>
-        // To keep the example simple, the user's LinkedIn profile is returned to
-        // represent the logged-in user.  In a typical application, you would want
-        // to associate the LinkedIn account with a user record in your database,
-        // and return that user instead.
-        done(null, profile)
-      );
-    }
-  )
-);
-
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: GOOGLE.CLIENT_ID,
-      clientSecret: GOOGLE.CLIENT_SECRET,
-      callbackURL: GOOGLE.CALLBACK_URL,
-    },
-    (accessToken, refreshToken, profile, cb) => cb(null, profile)
-  )
-);
-// Configure Passport authenticated session persistence.
-//
-// In order to restore authentication state across HTTP requests, Passport needs
-// to serialize users into and deserialize users out of the session.  In a
-// production-quality application, this would typically be as simple as
-// supplying the user ID when serializing, and querying the user record by ID
-// from the database when deserializing.  However, due to the fact that this
-// example does not have a database, the complete Facebook profile is serialized
-// and deserialized.
 passport.serializeUser((user, cb) => {
   cb(null, user);
 });
