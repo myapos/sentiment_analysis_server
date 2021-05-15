@@ -45,6 +45,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-#config.js
+#comment for deploying keys to heroku
+config.js
 
 .env
