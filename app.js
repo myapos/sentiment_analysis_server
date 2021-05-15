@@ -1,3 +1,8 @@
+if (process.env.NODE_ENV !== 'production') {
+  console.log('edw');
+  require('dotenv').config();
+}
+
 const express = require('express');
 const passport = require('passport');
 const cors = require('cors');
