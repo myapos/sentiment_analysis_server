@@ -13,7 +13,7 @@ const Profile = (app) => {
         httpOnly: false,
         domain: 'https://sentimental-analysis-dashboard.herokuapp.com/',
         //   secure: false,
-        sameSite: true,
+        // sameSite: true,
       });
       res.redirect(`${env.CLIENT_BASE_URL}?name=${encodeURIComponent(
         displayName,
