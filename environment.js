@@ -7,7 +7,7 @@ const environment = () => {
     env.BASE_URL = `http://localhost:${env.PORT}`;
   } else {
     // production environment
-    env.BASE_URL = 'https://sentimental-analysis-server.herokuapp.com/';
+    env.BASE_URL = 'https://sentimental-analysis-dashboard.herokuapp.com/';
   }
 
   console.log('process.env.NODE_ENV', process.env.NODE_ENV, 'env', env);
