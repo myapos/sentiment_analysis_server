@@ -37,7 +37,7 @@ passport.deserializeUser((obj, cb) => {
 // Create a new Express application.
 const app = express();
 
-if (env.isInDev) {
+if (!env.isInDev) {
   console.log('enable proxy');
   app.enable('trust proxy');
   app.set('trust proxy', 1);
