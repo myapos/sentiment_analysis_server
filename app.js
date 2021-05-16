@@ -6,7 +6,9 @@ if (process.env.NODE_ENV !== 'production') {
 const express = require('express');
 const passport = require('passport');
 const cors = require('cors');
+const environemt = require('./environment');
 
+const env = environment();
 /* Strategies */
 
 const helmet = require('helmet');
@@ -37,7 +39,7 @@ const app = express();
 app.enable('trust proxy');
 
 app.use(helmet());
-app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
+app.use(cors({ credentials: true, origin: `${env.BASE_URL}` }));
 app.use(cors());
 
 app.use(require('cookie-parser')());
