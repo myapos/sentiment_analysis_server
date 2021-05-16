@@ -8,7 +8,15 @@ const Profile = (app) => {
     require('connect-ensure-login').ensureLoggedIn(),
     (req, res) => {
       const { id, displayName, provider } = req.user;
-      res.cookie('connect.sid', req.cookies['connect.sid'], {
+      /* res.cookie('connect.sid', req.cookies['connect.sid'], {
+        maxAge: 30 * 60 * 1000, // 1/2 hour
+        httpOnly: false,
+        domain: 'https://sentimental-analysis-dashboard.herokuapp.com/',
+        //   secure: false,
+        // sameSite: true,
+      }); */
+
+      res.cookie('connect.sid', {
         maxAge: 30 * 60 * 1000, // 1/2 hour
         httpOnly: false,
         domain: 'https://sentimental-analysis-dashboard.herokuapp.com/',
