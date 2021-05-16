@@ -36,7 +36,11 @@ passport.deserializeUser((obj, cb) => {
 
 // Create a new Express application.
 const app = express();
-app.enable('trust proxy');
+
+if (process.env.NODE_ENV !== 'development') {
+  app.enable('trust proxy');
+  app.set('trust proxy', 1);
+}
 
 app.use(helmet());
 app.use(cors({ credentials: true, origin: `${env.CLIENT_BASE_URL}` }));
