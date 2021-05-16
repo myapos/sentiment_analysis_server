@@ -55,7 +55,7 @@ app.use(
     secret: 'keyboard cat',
     resave: true,
     saveUninitialized: true,
-    proxy: true,
+    proxy: !env.isInDev,
   })
 );
 
