@@ -4,10 +4,11 @@ const environment = () => {
 
   if (process.env.NODE_ENV === 'development') {
     env.PORT = '8585';
-    env.BASE_URL = `http://localhost:${env.PORT}`;
+    // env.CLIENT_BASE_URL = `http://localhost:${env.PORT}`;
+    env.CLIENT_BASE_URL = 'http://localhost:3000';
   } else {
     // production environment
-    env.BASE_URL = 'https://sentimental-analysis-dashboard.herokuapp.com/';
+    env.CLIENT_BASE_URL =      'https://sentimental-analysis-dashboard.herokuapp.com/';
   }
 
   console.log('process.env.NODE_ENV', process.env.NODE_ENV, 'env', env);

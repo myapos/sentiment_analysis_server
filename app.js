@@ -39,7 +39,7 @@ const app = express();
 app.enable('trust proxy');
 
 app.use(helmet());
-app.use(cors({ credentials: true, origin: `${env.BASE_URL}` }));
+app.use(cors({ credentials: true, origin: `${env.CLIENT_BASE_URL}` }));
 app.use(cors());
 
 app.use(require('cookie-parser')());

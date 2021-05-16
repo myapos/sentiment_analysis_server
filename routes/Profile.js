@@ -1,6 +1,6 @@
 const environment = require('../environment');
 
-//  origin: `${env.BASE_URL}` }
+//  origin: `${env.CLIENT_BASE_URL}` }
 const Profile = (app) => {
   const env = environment();
   app.get(
@@ -14,7 +14,9 @@ const Profile = (app) => {
         //   secure: false,
         sameSite: true,
       });
-      res.redirect(`${env.BASE_URL}?name=${encodeURIComponent(displayName)}
+      res.redirect(`${env.CLIENT_BASE_URL}?name=${encodeURIComponent(
+        displayName,
+      )}
           &id=${encodeURIComponent(id)}
           &provider=${encodeURIComponent(provider)}`);
     },
