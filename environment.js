@@ -1,6 +1,7 @@
 /* It will detect the environment and return any related environment variable */
 const environment = () => {
   const env = {};
+  env.isInDev = process.env.NODE_ENV === 'development';
 
   if (process.env.NODE_ENV === 'development') {
     env.PORT = '8585';
