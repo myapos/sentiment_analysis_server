@@ -11,7 +11,7 @@ const Profile = (app) => {
       res.cookie('connect.sid', req.cookies['connect.sid'], {
         maxAge: 30 * 60 * 1000, // 1/2 hour
         httpOnly: false,
-        // domain: 'herokuapp.com',
+        domain: 'herokuapp.com',
         //   secure: false,
         // sameSite: true,
       });
