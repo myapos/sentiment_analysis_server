@@ -12,6 +12,7 @@ const Profile = (app) => {
         maxAge: 30 * 60 * 1000, // 1/2 hour
         httpOnly: false,
         proxy: true,
+        domain: 'herokuapp.com',
         //   secure: false,
         sameSite: true,
       });
