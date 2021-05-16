@@ -13,7 +13,7 @@ const Profile = (app) => {
         httpOnly: false,
         domain: 'herokuapp.com',
         //   secure: false,
-        // sameSite: true,
+        sameSite: true,
       });
 
       /* res.cookie('connect.sid', {
