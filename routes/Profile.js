@@ -12,8 +12,10 @@ const Profile = (app) => {
         maxAge: 30 * 60 * 1000, // 1/2 hour
         httpOnly: false,
         //   secure: false,
+        domain: 'herokuapp.com',
         sameSite: true,
       });
+
       res.redirect(`${env.CLIENT_BASE_URL}?name=${encodeURIComponent(
         displayName,
       )}
