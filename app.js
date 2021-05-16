@@ -6,7 +6,7 @@ if (process.env.NODE_ENV !== 'production') {
 const express = require('express');
 const passport = require('passport');
 const cors = require('cors');
-const environemt = require('./environment');
+const environment = require('./environment');
 
 const env = environment();
 /* Strategies */

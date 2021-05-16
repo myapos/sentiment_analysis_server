@@ -17,4 +17,4 @@ const environment = () => {
   };
 };
 
-export default environment;
+module.exports = environment;
