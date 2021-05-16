@@ -11,9 +11,9 @@ const Profile = (app) => {
       res.cookie('connect.sid', req.cookies['connect.sid'], {
         maxAge: 30 * 60 * 1000, // 1/2 hour
         httpOnly: false,
+        domain: 'https://sentimental-analysis-dashboard.herokuapp.com/',
         //   secure: false,
-        // sameSite: true,
-        sameSite: false,
+        sameSite: true,
       });
       res.redirect(`${env.CLIENT_BASE_URL}?name=${encodeURIComponent(
         displayName,
