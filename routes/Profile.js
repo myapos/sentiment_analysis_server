@@ -13,7 +13,6 @@ const Profile = (app) => {
         httpOnly: false,
         proxy: true,
         //   secure: false,
-        domain: 'sentimental-analysis-dashboard.herokuapp.com/',
         sameSite: true,
       });
 
