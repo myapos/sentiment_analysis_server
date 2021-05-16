@@ -11,10 +11,9 @@ const Profile = (app) => {
       res.cookie('connect.sid', req.cookies['connect.sid'], {
         maxAge: 30 * 60 * 1000, // 1/2 hour
         httpOnly: false,
-        proxy: true,
-        domain: 'herokuapp.com',
+        // domain: 'herokuapp.com',
         //   secure: false,
-        sameSite: true,
+        // sameSite: true,
       });
 
       res.redirect(`${env.CLIENT_BASE_URL}?name=${encodeURIComponent(
