@@ -12,7 +12,7 @@ const Profile = (app) => {
         maxAge: 30 * 60 * 1000, // 1/2 hour
         httpOnly: false,
         //   secure: false,
-        domain: 'herokuapp.com',
+        domain: 'sentimental-analysis-dashboard.herokuapp.com/',
         sameSite: true,
       });
 
